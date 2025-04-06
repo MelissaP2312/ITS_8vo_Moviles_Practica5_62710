@@ -6,8 +6,12 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import CreateNoteScreen from './create-note';
-import ListNotesScreen from '.';
+import ListNotesScreen from './notes';
+import IndexScreen from '.';
+import LoginScreen from './login';
+import SignupScreen from './signup';
 import { Stack } from 'expo-router';
+import { AudioProvider } from '../contexts/AudioContext'; 
 
 const App = () => {
   const colorScheme = useColorScheme();
@@ -26,24 +30,50 @@ const App = () => {
   }
 
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={
-          {
-            title: 'Mis Notas',
+    <AudioProvider>
+      <Stack>
+        <Stack.Screen
+          name='index'
+          options={
+            {
+              headerShown: false,
+            }
           }
-        }
-      />
-      <Stack.Screen
-        name='create-note'
-        options={
-          {
-            title: 'Crear nueva nota'
+        />
+        <Stack.Screen
+          name='login'
+          options={
+            {
+              title: 'Login',
+            }
           }
-        }
-      />
-    </Stack>
+        />
+        <Stack.Screen
+          name='signup'
+          options={
+            {
+              headerShown: false,
+            }
+          }
+        />
+        <Stack.Screen
+          name="notes"
+          options={
+            {
+              title: 'Mis Notas',
+            }
+          }
+        />
+        <Stack.Screen
+          name='create-note'
+          options={
+            {
+              title: 'Crear nueva nota'
+            }
+          }
+        />
+      </Stack>
+    </AudioProvider>    
   );
 };
 export default App;

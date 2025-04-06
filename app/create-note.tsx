@@ -61,6 +61,7 @@ export default function CreateNoteScreen() {
       alert('Error al guardar la nota');
       console.error(error);
     }
+    
   };
 
   return (

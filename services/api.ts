@@ -1,5 +1,5 @@
 // app/services/api.ts
-const API_BASE_URL = 'https://camps-southeast-mysterious-similarly.trycloudflare.com/api';
+const API_BASE_URL = 'https://rated-flight-repair-allocation.trycloudflare.com/api';
 
 interface Tarea {
   id: number;

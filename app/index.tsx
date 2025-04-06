@@ -1,175 +1,168 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Card, IconButton, Text } from 'react-native-paper';
-import useNotes from '../hooks/useNotes';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MotiImage } from 'moti';
+import { Audio } from 'expo-av';
+import { useAudio } from '../contexts/AudioContext'; 
 
-export default function NotesListScreen() {
+export default function IndexScreen() {
   const router = useRouter();
-  const { notes, isLoading, error, deleteNote, loadNotes } = useNotes();
+  const { playSound, stopSound } = useAudio();
 
   useFocusEffect(
     useCallback(() => {
-      loadNotes();
-    }, [loadNotes])
+      playSound(require('../assets/audio/index.mp3'), 0.3); // Reproducir el audio al obtener foco
+
+      return () => {
+        stopSound(); // Detener el sonido al perder el foco
+      };
+    }, []) // Reproducir audio sin esperar que esté cargado
   );
 
-  const handleEditNote = (noteId: number) => {
-    router.push(`/create-note?id=${noteId}`);
-  };
-
-  const handleDeleteNote = async (noteId: number) => {
-    Alert.alert(
-      'Eliminar Nota',
-      '¿Estás seguro de que quieres eliminar esta nota?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Eliminar', 
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteNote(noteId);
-            } catch (error) {
-              Alert.alert('Error', 'No se pudo eliminar la nota');
-            }
-          }
-        }
-      ]
-    );
-  };
-
-  if (isLoading) {
-    return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator animating={true} size="large" />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {isLoading ? (
-          <Text>Cargando notas...</Text>
-        ) : notes.length === 0 ? (
-          <Text style={styles.emptyText}>No hay notas creadas</Text>
-        ) : (
-          notes.map(note => (
-            <Card key={note.id} style={styles.card}>
-              <Card.Title
-                title={note.titulo}
-                titleStyle={styles.cardTitle}
-              />
-              <Card.Content>
-                <Text 
-                  numberOfLines={3} 
-                  ellipsizeMode="tail"
-                  style={styles.cardContent}
-                >
-                  {note.descripcion.replace(/<[^>]*>/g, '').substring(0, 200)}
-                </Text>
-              </Card.Content>
-              <Card.Actions style={styles.cardActions}>
-                <IconButton
-                  icon="pencil"
-                  size={24}
-                  onPress={() => handleEditNote(note.id)}
-                  style={styles.actionButton}
-                />
-                <IconButton
-                  icon="delete"
-                  size={24}
-                  onPress={() => handleDeleteNote(note.id)}
-                  style={styles.actionButton}
-                />
-              </Card.Actions>
-            </Card>
-          ))
-        )}
-      </ScrollView>
-      
-      {/* Floating Action Button */}
-      <TouchableOpacity 
-        style={styles.fab}
-        onPress={() => router.push('/create-note')}
+    <View style={styles.wrapper}>
+      <LinearGradient
+        colors={['rgba(245,245,220,0.95)', 'rgba(241,196,15,0.9)']}
+        style={styles.container}
       >
-        <MaterialIcons name="add" size={24} color="white" />
-      </TouchableOpacity>
+        {/* Logo Pokémon */}
+        <MotiImage
+          source={require('../assets/images/Pokemon-Logo.png')}
+          style={styles.logo}
+          from={{ opacity: 0, translateY: 50 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{
+            type: 'timing',
+            duration: 2000,
+            delay: 500,
+          }}
+        />
+
+        {/* Pokébola animada */}
+        <MotiImage
+          source={require('../assets/images/pokeball.png')}
+          style={styles.animatedPokeball}
+          from={{ scale: 0.5 }}
+          animate={{ scale: 1.2 }}
+          transition={{
+            type: 'timing',
+            duration: 1000,
+            loop: true,
+            repeatReverse: true,
+          }}
+        />
+
+        <Text style={styles.title}>Bienvenidos al Centro Pokémon</Text>
+
+        {/* Contenedor de botones */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.pokeButton}
+            onPress={() => router.push('./login')}
+          >
+            <LinearGradient
+              colors={['#e74c3c', '#c0392b']}
+              style={styles.buttonGradient}
+            >
+              <Text style={styles.buttonText}>Ingresar a la PC de Bill</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.pokeButton, styles.registerButton]}
+            onPress={() => router.push('./signup')}
+          >
+            <LinearGradient
+              colors={['#3498db', '#2980b9']}
+              style={styles.buttonGradient}
+            >
+              <Text style={[styles.buttonText, styles.lightText]}>Unirse al Club de Entrenadores</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        <Image
+          source={require('../assets/images/charizard.png')}
+          style={styles.pokemon}
+          resizeMode="contain"
+        />
+      </LinearGradient>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  centerContainer: {
+  wrapper: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 16,
-  },
-  statusContainer: {
-    marginRight: 16,
-  },
-  completedText: {
-    color: 'green',
-  },
-  pendingText: {
-    color: 'orange',
+    position: 'relative',
   },
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollContainer: {
-    paddingBottom: 80,
-  },
-  card: {
-    marginBottom: 16,
-    elevation: 3,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  cardContent: {
-    color: '#555',
-    marginTop: 8,
-  },
-  cardActions: {
-    justifyContent: 'flex-end',
-  },
-  actionButton: {
-    margin: 0,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    color: '#666',
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    backgroundColor: '#6200ee',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
     justifyContent: 'center',
-    elevation: 4,
+    alignItems: 'center',
+    padding: 20,
+  },
+  logo: {
+    width: 250,
+    height: 100,
+    marginBottom: 10,
+  },
+  animatedPokeball: {
+    width: 60,
+    height: 60,
+    marginBottom: 20,
+  },
+  title: {
+    color: '#d35400',
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 40,
+    fontFamily: 'PokemonSolid',
+    textShadowColor: '#fff',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+    textAlign: 'center',
+    width: '90%',
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  pokeButton: {
+    width: '80%',
+    height: 60,
+    marginVertical: 15,
+    borderRadius: 30,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#2c3e50',
+  },
+  registerButton: {
+    borderColor: '#2980b9',
+  },
+  buttonGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+  lightText: {
+    color: '#ecf0f1',
+  },
+  pokemon: {
+    position: 'absolute',
+    bottom: 10,
+    right: 20,
+    width: 80,
+    height: 80,
+    opacity: 0.9,
   },
 });

@@ -57,25 +57,6 @@ export default function NotesListScreen() {
     );
   }
 
-  const sound = new Audio.Sound();
-
-  useEffect(() => {
-    const loadSound = async () => {
-      try {
-        await sound.loadAsync(require('../assets/audio/notes.mp3'));
-        await sound.playAsync();
-      } catch (error) {
-        console.log('Error loading sound', error);
-      }
-    };
-
-    loadSound();
-
-    return () => {
-      sound.unloadAsync();
-    };
-  }, []);
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>

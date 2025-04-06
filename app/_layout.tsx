@@ -44,7 +44,7 @@ const App = () => {
           name='login'
           options={
             {
-              title: 'Login',
+              headerShown: false,
             }
           }
         />

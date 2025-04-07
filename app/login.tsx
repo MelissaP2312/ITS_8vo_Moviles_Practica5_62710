@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, TextInput, TouchableOpacity, View, Text } from 'react-native';
 import { Audio } from 'expo-av';
 import { useAudio } from '@/contexts/AudioContext';
@@ -28,33 +28,31 @@ export default function LoginScreen() {
       Alert.alert('Error', 'Por favor completa todos los campos');
       return;
     }
-  
+
     if (!validateEmail(email)) {
       Alert.alert('Error', 'El correo electrónico no es válido');
       return;
     }
-  
+
     if (!validatePassword(password)) {
       Alert.alert('Error', 'La contraseña debe tener al menos 8 caracteres');
       return;
     }
-  
+
     try {
       const data = await api.login(email, password); // email es username
       const token = data.token;
-  
+
       // Guardar el token en el almacenamiento seguro, si es necesario
       await SecureStore.setItemAsync('jwt', token); 
-  
-      // Redirigir a la vista de notas (puedes poner el nombre correcto de la ruta)
-      router.push('/notes');  // Asegúrate de que '/notes' sea la ruta correcta de tu aplicación
-  
+
+      // Redirigir a la vista de notas
+      router.push('/notes');
     } catch (error: any) {
       Alert.alert('Error', 'Credenciales inválidas o problema de red');
       console.error(error.message);
     }
   };
-  
 
   const handleSignupRedirect = () => {
     router.push('/signup');
@@ -74,6 +72,13 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.wrapper}>
+      {/* Botón de flecha en la esquina superior izquierda */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.push('/')}
+      >
+        <MaterialIcons name="arrow-back" size={30} color="#fff" />
+      </TouchableOpacity>
       <LinearGradient
         colors={['rgba(245, 220, 220, 0.95)', 'rgba(241, 15, 15, 0.9)']}
         style={styles.container}
@@ -89,48 +94,10 @@ export default function LoginScreen() {
             delay: 500,
           }}
         />
-        
-        <Text style={styles.title}>Iniciar Sesión</Text>
 
-        <ScrollView
-          style={styles.scrollContainer}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <TextInput
-            style={styles.input}
-            placeholder="Correo electrónico"
-            placeholderTextColor="#999"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
-          
-          <TextInput
-            style={styles.input}
-            placeholder="Contraseña"
-            placeholderTextColor="#999"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-          
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={handleLogin}
-          >
-            <Text style={styles.buttonText}>Ingresar</Text>
-          </TouchableOpacity>
+        <Text style={styles.title}>Acceder a la Pokédex</Text>
 
-          <TouchableOpacity 
-            style={styles.secondaryButton}
-            onPress={handleSignupRedirect}
-          >
-            <Text style={styles.secondaryButtonText}>¿No tienes cuenta? Regístrate</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
+        {/* Pokébola en el medio */}
         <MotiImage
           source={require('../assets/images/pokeball.png')}
           style={styles.pokeball}
@@ -143,6 +110,83 @@ export default function LoginScreen() {
             repeatReverse: true,
           }}
         />
+
+        {/* Cuadro de texto de correo */}
+        <LinearGradient
+          colors={['#e74c3c', '#c0392b']} // Rojo retro
+          style={styles.inputContainer}
+        >
+          <TextInput
+            style={styles.input}
+            placeholder="ID de Entrenador"
+            placeholderTextColor="#fff"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </LinearGradient>
+
+        {/* Cuadro de texto de contraseña */}
+        <LinearGradient
+          colors={['#e74c3c', '#c0392b']} // Rojo retro
+          style={styles.inputContainer}
+        >
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña de la Pokébola"
+            placeholderTextColor="#fff"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </LinearGradient>
+
+        {/* Botón de login */}
+        <TouchableOpacity 
+          style={styles.pokeButton} 
+          onPress={handleLogin}
+        >
+          <LinearGradient
+            colors={['#2980b9', '#3498db']} // Azul retro
+            style={styles.buttonGradient}
+          >
+            <Text style={styles.buttonText}>Acceder</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Botón de redirección a registro */}
+        <TouchableOpacity 
+          style={styles.secondaryButton}
+          onPress={handleSignupRedirect}
+        >
+          <Text style={styles.secondaryButtonText}>¿Nuevo en el Mundo Pokémon? Únete al Club de Entrenadores</Text>
+        </TouchableOpacity>
+
+        {/* Umbreon animado */}
+        <MotiImage
+          source={require('../assets/images/umbreon.png')}
+          style={[styles.pokemon, { shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.7, shadowRadius: 20 }]}
+          from={{
+            opacity: 0,
+            scale: 0.9,
+            rotate: '-3deg',
+            shadowOpacity: 0, // Sombra al principio no visible
+          }}
+          animate={{
+            opacity: 1,
+            scale: 1.05,
+            rotate: '3deg',
+            shadowOpacity: 50, // Sombra aparece con la animación
+          }}
+          transition={{
+            type: 'timing',
+            duration: 2000,
+            loop: true,
+            repeatReverse: true,
+          }}
+          resizeMode="contain"
+        />
       </LinearGradient>
     </View>
   );
@@ -153,11 +197,25 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
+  pokemon: {
+    position: 'absolute',
+    bottom: 10,
+    right: 20,
+    width: 80,
+    height: 80,
+    opacity: 0.9,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 1,
   },
   logo: {
     width: 250,
@@ -167,9 +225,7 @@ const styles = StyleSheet.create({
   pokeball: {
     width: 60,
     height: 60,
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
+    marginVertical: 20,
   },
   title: {
     fontSize: 26,
@@ -182,45 +238,37 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
-  scrollContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    justifyContent: 'center',
-    flexGrow: 1,
+  inputContainer: {
+    width: '100%',
+    marginBottom: 15,
+    borderRadius: 30, // Bordes más redondeados
+    overflow: 'hidden',
   },
   input: {
     height: 50,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    color: '#333',
+    backgroundColor: 'transparent',
+    color: '#fff',
     fontSize: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
   },
-  button: {
-    height: 50,
-    borderRadius: 10,
-    backgroundColor: '#e74c3c',
+  pokeButton: {
+    width: '80%',
+    height: 60,
+    marginVertical: 15,
+    borderRadius: 30,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#2c3e50',
+  },
+  buttonGradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
+    borderRadius: 10,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   secondaryButton: {
@@ -228,8 +276,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: '#3498db',
+    color: '#f1c40f', // Amarillo retro
     fontSize: 14,
     fontWeight: '500',
+    textDecorationLine: 'underline', // Subrayado para el link
+    textAlign: 'center',
   },
 });

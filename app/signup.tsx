@@ -1,11 +1,11 @@
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useState, useEffect } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, TextInput, TouchableOpacity, View, Text } from 'react-native';
-import { Audio } from 'expo-av';
 import { useAudio } from '@/contexts/AudioContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiImage } from 'moti';
+import { Audio } from 'expo-av';
 import { api } from '@/services/api';
 
 export default function SignupScreen() {
@@ -28,15 +28,26 @@ export default function SignupScreen() {
       Alert.alert('Error', error.message || 'No se pudo registrar');
     }
   };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      playSound(require('../assets/audio/register.mp3'), 0.2); // Reproducir el audio al obtener foco
 
-  React.useEffect(() => {
-    playSound(require('../assets/audio/register.mp3'), 0.2);
-
-    return () => stopSound();
-  }, []);
+      return () => {
+        stopSound(); // Detener el sonido al perder el foco
+      };
+    }, []) // Reproducir audio sin esperar que esté cargado
+  );
 
   return (
     <View style={styles.wrapper}>
+      {/* Botón de flecha en la esquina superior izquierda */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.push('/')}
+      >
+        <MaterialIcons name="arrow-back" size={30} color="#fff" />
+      </TouchableOpacity>
       <LinearGradient
         colors={['rgba(200, 240, 255, 0.95)', 'rgba(0, 160, 255, 0.9)']}
         style={styles.container}
@@ -53,47 +64,9 @@ export default function SignupScreen() {
           }}
         />
 
-        <Text style={styles.title}>Crear Cuenta</Text>
+        <Text style={styles.title}>¡Únete a la Liga Pokémon!</Text>
 
-        <ScrollView
-          style={styles.scrollContainer}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <TextInput
-            style={styles.input}
-            placeholder="Correo electrónico"
-            placeholderTextColor="#999"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Contraseña"
-            placeholderTextColor="#999"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleRegister}
-          >
-            <Text style={styles.buttonText}>Registrarse</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push('/')}
-          >
-            <Text style={styles.secondaryButtonText}>¿Ya tienes cuenta? Inicia sesión</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
+        {/* Pokebola animada */}
         <MotiImage
           source={require('../assets/images/pokeball.png')}
           style={styles.pokeball}
@@ -106,6 +79,61 @@ export default function SignupScreen() {
             repeatReverse: true,
           }}
         />
+
+        {/* Campo de correo */}
+        <LinearGradient colors={['#3498db', '#2980b9']} style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="ID de entrenador"
+            placeholderTextColor="#fff"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </LinearGradient>
+
+        {/* Campo de contraseña */}
+        <LinearGradient colors={['#3498db', '#2980b9']} style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Código secreto"
+            placeholderTextColor="#fff"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </LinearGradient>
+
+        {/* Botón de registro */}
+        <TouchableOpacity style={styles.pokeButton} onPress={handleRegister}>
+          <LinearGradient colors={['#e74c3c', '#c0392b']} style={styles.buttonGradient}>
+            <Text style={styles.buttonText}>¡Unirme al equipo!</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Link a login */}
+        <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/')}>
+          <Text style={styles.secondaryButtonText}>¿Ya tienes cuenta? Entra al PokéCentro</Text>
+        </TouchableOpacity>
+
+        {/* Abra animado */}
+        <MotiImage
+          source={require('../assets/images/abra.png')}
+          style={styles.abra}
+          from={{ translateY: 0, opacity: 0.7 }}
+          animate={{
+            translateY: -10,
+            opacity: 1,
+          }}
+          transition={{
+            type: 'timing',
+            duration: 1500,
+            loop: true,
+            repeatReverse: true,
+          }}
+          resizeMode="contain"
+        />
       </LinearGradient>
     </View>
   );
@@ -115,6 +143,20 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 1,
+  },
+  abra: {
+    position: 'absolute',
+    bottom: 10,
+    right: 20,
+    width: 80,
+    height: 80,
+    opacity: 0.9,
   },
   container: {
     flex: 1,
@@ -127,13 +169,6 @@ const styles = StyleSheet.create({
     height: 100,
     marginBottom: 30,
   },
-  pokeball: {
-    width: 60,
-    height: 60,
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-  },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
@@ -145,45 +180,37 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
-  scrollContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    justifyContent: 'center',
-    flexGrow: 1,
+  inputContainer: {
+    width: '100%',
+    marginBottom: 15,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   input: {
     height: 50,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    color: '#333',
+    backgroundColor: 'transparent',
+    color: '#fff',
     fontSize: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
   },
-  button: {
-    height: 50,
-    borderRadius: 10,
-    backgroundColor: '#0077b6',
+  pokeButton: {
+    width: '80%',
+    height: 60,
+    marginVertical: 15,
+    borderRadius: 30,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#2c3e50',
+  },
+  buttonGradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
+    borderRadius: 10,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   secondaryButton: {
@@ -194,5 +221,12 @@ const styles = StyleSheet.create({
     color: '#f1c40f',
     fontSize: 14,
     fontWeight: '500',
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
+  pokeball: {
+    width: 60,
+    height: 60,
+    marginVertical: 20,
   },
 });

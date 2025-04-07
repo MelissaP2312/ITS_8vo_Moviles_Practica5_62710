@@ -10,6 +10,7 @@ import ListNotesScreen from './notes';
 import IndexScreen from '.';
 import LoginScreen from './login';
 import SignupScreen from './signup';
+import WrongDataScreen from './wrong-data';
 import { Stack } from 'expo-router';
 import { AudioProvider } from '../contexts/AudioContext'; 
 
@@ -57,10 +58,18 @@ const App = () => {
           }
         />
         <Stack.Screen
+          name='wrong-data'
+          options={
+            {
+              headerShown: false,
+            }
+          }
+        />
+        <Stack.Screen
           name="notes"
           options={
             {
-              title: 'Mis Notas',
+              headerShown: false,
             }
           }
         />

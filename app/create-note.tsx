@@ -1,11 +1,12 @@
 import CustomRichEditor from '@/components/CustomRichEditor';
 import useNotes from '@/hooks/useNotes';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
+import { useAudio } from '@/contexts/AudioContext';
 
 export default function CreateNoteScreen() {
   const router = useRouter();
@@ -18,6 +19,17 @@ export default function CreateNoteScreen() {
   const [completed, setCompleted] = useState(false);
   
   const { notes, saveNote, updateNote } = useNotes();
+  const { playSound, stopSound } = useAudio();
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      playSound(require('../assets/audio/notes.mp3'), 0.3); 
+
+      return () => {
+        stopSound();
+      };
+    }, []) 
+  );
 
   useEffect(() => {
     if (id) {

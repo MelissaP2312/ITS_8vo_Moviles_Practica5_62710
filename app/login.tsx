@@ -49,7 +49,9 @@ export default function LoginScreen() {
       // Redirigir a la vista de notas
       router.push('/notes');
     } catch (error: any) {
+      // Manejo de errores
       Alert.alert('Error', 'Credenciales inválidas o problema de red');
+      router.push('/wrong-data');
       console.error(error.message);
     }
   };

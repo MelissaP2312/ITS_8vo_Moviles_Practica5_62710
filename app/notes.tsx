@@ -21,7 +21,7 @@ export default function NotesListScreen() {
 
   useFocusEffect(
     React.useCallback(() => {
-      playSound(require('../assets/audio/notes.mp3'), 0.2); // Reproducir el audio al obtener foco
+      playSound(require('../assets/audio/logged.mp3'), 0.2); // Reproducir el audio al obtener foco
 
       return () => {
         stopSound(); // Detener el sonido al perder el foco
@@ -97,15 +97,15 @@ export default function NotesListScreen() {
             <Text style={styles.loadingText}>¡Un momento, Entrenador!</Text>
           ) : notes.length === 0 ? (
             <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>
-            ¡Tu Pokédex está vacío!
-          </Text>
-          <Image
-            source={require('../assets/images/abra.png')} // Asegúrate de tener esta imagen en tu proyecto
-            style={styles.emptyImage}
-            resizeMode="contain"
-          />
-  </View>
+              <Text style={styles.emptyText}>
+                ¡Tu Pokédex está vacío!
+              </Text>
+              <Image
+                source={require('../assets/images/abra.png')} // Asegúrate de tener esta imagen en tu proyecto
+                style={styles.emptyImage}
+                resizeMode="contain"
+              />
+            </View>
           ) : (
             notes.map(note => (
               <Card key={note.id} style={styles.card}>

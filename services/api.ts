@@ -1,7 +1,7 @@
 // app/services/api.ts
 import * as SecureStore from 'expo-secure-store';
 
-const API_BASE_URL = 'https://walks-islamic-branches-usr.trycloudflare.com/api';
+const API_BASE_URL = 'https://omaha-ready-retained-jersey.trycloudflare.com/api';
 
 interface Tarea {
   id: number;

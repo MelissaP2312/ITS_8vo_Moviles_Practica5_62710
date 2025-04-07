@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card, IconButton, Text } from 'react-native-paper';
 import useNotes from '../hooks/useNotes';
 import { useAudio } from '@/contexts/AudioContext';
-import { LinearGradient } from 'expo-linear-gradient'; // Importar LinearGradient
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function NotesListScreen() {
   const router = useRouter();

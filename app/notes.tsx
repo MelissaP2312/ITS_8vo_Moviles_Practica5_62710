@@ -58,7 +58,7 @@ export default function NotesListScreen() {
     try {
       // Borrar el token de AsyncStorage
       await AsyncStorage.removeItem('token');
-      router.push('./index'); // Redirigir a la página de login
+      router.push('/login'); // Redirigir a la página de login
     } catch (error) {
       Alert.alert('Error', 'Hubo un problema al cerrar sesión');
     }
